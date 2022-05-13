@@ -78,22 +78,24 @@ const App = (props) => {
       <DefaultButton className="ms-welcome__action" onClick={checkParagraphs}>
         Check Paragraphs
       </DefaultButton>
-      {errors.length > 0 && (
-        <div>
-          <h2>Errors</h2>
-          <ul>
-            {errors.map((error) => (
-              <>
-                <li>
-                  <ErrorMessage error={error} />
-                </li>
-                <br></br>
-              </>
-            ))}
-          </ul>
-        </div>
-      )}
+      <ErrorList errors={errors} />
     </>
+  );
+};
+
+const ErrorList = ({ errors }) => {
+  if (errors.length === 0) {
+    return null;
+  }
+  return (
+    <div>
+      {errors.map((error, index) => (
+        <>
+          <br></br>
+          <ErrorMessage key={index} error={error} />
+        </>
+      ))}
+    </div>
   );
 };
 
