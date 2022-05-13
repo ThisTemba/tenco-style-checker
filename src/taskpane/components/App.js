@@ -1,52 +1,67 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { DefaultButton } from "@fluentui/react";
+import { DefaultButton, Link } from "@fluentui/react";
 import Progress from "./Progress";
 
 /* global Word, require */
+
+// TODO: group errors by paragraph (heading)
+// TODO: display errors grouped (in simple way, don't waste time)
+// TODO: test running "checkParagraphs" after every change
+// TODO: consider creating a gmail add-in
+
+const commonFont = { bold: true, name: "Arial", color: "#000000" };
 const correctFormats = {
-  "Heading 1": { font: { bold: true, size: 12, name: "Arial" }, isListItem: true },
-  "Heading 2": { font: { bold: true, size: 12, name: "Arial" }, isListItem: true },
-  "Heading 3": { font: { bold: true, size: 10, name: "Arial" }, isListItem: true },
-  "Heading 4": { font: { bold: true, size: 10, name: "Arial", italic: true }, isListItem: true },
+  "Heading 1": { font: { ...commonFont, size: 12 }, isListItem: true },
+  "Heading 2": { font: { ...commonFont, size: 12 }, isListItem: true },
+  "Heading 3": { font: { ...commonFont, size: 10 }, isListItem: true },
+  "Heading 4": { font: { ...commonFont, size: 10, italic: true }, isListItem: true },
   // TODO: make this check not just font props but also paragraph props such as
   // isListItem, spaceAfter, etc.
   // Normal: { bold: false, size: 12, name: "Times New Roman" },
 };
 
-const getErrorMessage = ({ property, correct, actual, location }) => {
-  return `Font ${property} should be ${correct} but is ${actual} at: ${getBreadcrumb(location)}`;
-};
-
 const ErrorMessage = ({ error }) => {
-  const { property, actual, correct, location } = error;
+  const { property, actual, correct, paragraph } = error;
 
   return (
     <span>
-      Font <b>{property}</b> should be <b>{String(correct)}</b> but is <b>{String(actual)}</b> at:{" "}
-      <i>{getBreadcrumb(location)}</i>
+      Font <b>{property}</b> should be <b>{String(correct)}</b> but is <b>{String(actual)}</b> <br></br>
+      Location:{" "}
+      <Link href="#" onClick={() => jumpToParagraph(paragraph)}>
+        {paragraph.text}
+      </Link>
     </span>
   );
 };
 
-const getBreadcrumb = (list) => {
-  return list.filter((item) => item).join(" > ");
-};
+async function jumpToParagraph(paragraph) {
+  await Word.run(async (context) => {
+    // Select can be at the start or end of a range; this by definition moves the insertion point without selecting the range.
+    context.document.body.paragraphs.load("items");
+    await context.sync();
+    const paragraphs = context.document.body.paragraphs.items;
+    const paragraphOfInterest = paragraphs.find((p) => p._Id === paragraph._Id);
+    paragraphOfInterest.select();
 
-const updateLocation = (currentLocation, paragraph) => {
-  let headings = [...currentLocation];
-  const style = paragraph.style;
-  if (style === "Heading 1") {
-    headings = [paragraph.text];
-  } else if (style === "Heading 2") {
-    headings = [...headings.slice(0, 1), paragraph.text];
-  } else if (style === "Heading 3") {
-    headings = [...headings.slice(0, 2), paragraph.text];
-  } else if (style === "Heading 4") {
-    headings = [...headings.slice(0, 3), paragraph.text];
-  }
-  return headings;
-};
+    await context.sync();
+  });
+}
+
+function checkForErrors(correctFormat, actualFormat, paragraph, setErrors) {
+  Object.keys(correctFormat).forEach((property) => {
+    const actual = actualFormat[property];
+    const correct = correctFormat[property];
+    if (typeof actual !== "object") {
+      if (actual !== correct) {
+        const error = { property, actual, correct, paragraph };
+        setErrors((errors) => [...errors, error]);
+      }
+    } else {
+      checkForErrors(correctFormat[property], actualFormat[property], paragraph, setErrors);
+    }
+  });
+}
 
 const App = (props) => {
   const { title, isOfficeInitialized } = props;
@@ -65,32 +80,15 @@ const App = (props) => {
 
       await context.sync();
 
-      let currentLocation = [];
       paragraphs.items.forEach((paragraph) => {
         const actualFormat = paragraph.toJSON();
         const correctFormat = correctFormats[paragraph.style];
-        currentLocation = updateLocation(currentLocation, paragraph);
 
-        if (correctFormat) {
-          console.log(actualFormat, "Hello World", correctFormat);
-          Object.keys(correctFormat).forEach((property) => {
-            const actual = actualFormat[property];
-            const correct = correctFormat[property];
-            if (typeof actual !== "object") {
-              console.log(actual, correct);
-              if (actual !== correct) {
-                const error = { property, actual, correct, location: currentLocation };
-                setErrors((errors) => [...errors, error]);
-              }
-            } else {
-              console.log("object");
-              console.log(property);
-            }
-          });
+        if (correctFormat && paragraph.text) {
+          checkForErrors(correctFormat, actualFormat, paragraph, setErrors);
         }
       });
       console.log("done!");
-
       await context.sync();
     });
   };
