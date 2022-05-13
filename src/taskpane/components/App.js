@@ -21,6 +21,7 @@ const ErrorMessage = ({ error }) => {
       <Link href="#" onClick={() => jumpToParagraph(paragraph)}>
         {paragraph.text}
       </Link>
+      <br></br>
     </span>
   );
 };
@@ -44,7 +45,6 @@ const App = (props) => {
 
   const checkParagraphs = async () => {
     return Word.run(async (context) => {
-      setErrors([]);
       const paragraphs = context.document.body.paragraphs.load("items");
 
       await context.sync();
@@ -55,10 +55,11 @@ const App = (props) => {
 
       await context.sync();
 
+      setErrors([]);
       paragraphs.items.forEach((paragraph) => {
         lintParagraph(paragraph, setErrors);
       });
-      console.log("done!");
+
       await context.sync();
     });
   };
