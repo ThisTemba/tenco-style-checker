@@ -4,8 +4,8 @@ const correctFormats = {
   "Heading 2": { font: { ...commonFont, size: 12 }, isListItem: true },
   "Heading 3": { font: { ...commonFont, size: 10 }, isListItem: true },
   "Heading 4": { font: { ...commonFont, size: 10, italic: true }, isListItem: true },
+  // Normal: { font: { size: 12, name: "Times New Roman" } },
   // isListItem, spaceAfter, etc.
-  // Normal: { bold: false, size: 12, name: "Times New Roman" },
 };
 
 const getErrors = (correctFormat, actualFormat, paragraph) => {
