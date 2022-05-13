@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { DefaultButton, Link } from "@fluentui/react";
 import Progress from "./Progress";
+import lintParagraph from "../utils/lintParagraph";
 
 /* global Word, require */
 
@@ -9,17 +10,6 @@ import Progress from "./Progress";
 // TODO: display errors grouped (in simple way, don't waste time)
 // TODO: test running "checkParagraphs" after every change
 // TODO: consider creating a gmail add-in
-
-const commonFont = { bold: true, name: "Arial", color: "#000000" };
-const correctFormats = {
-  "Heading 1": { font: { ...commonFont, size: 12 }, isListItem: true },
-  "Heading 2": { font: { ...commonFont, size: 12 }, isListItem: true },
-  "Heading 3": { font: { ...commonFont, size: 10 }, isListItem: true },
-  "Heading 4": { font: { ...commonFont, size: 10, italic: true }, isListItem: true },
-  // TODO: make this check not just font props but also paragraph props such as
-  // isListItem, spaceAfter, etc.
-  // Normal: { bold: false, size: 12, name: "Times New Roman" },
-};
 
 const ErrorMessage = ({ error }) => {
   const { property, actual, correct, paragraph } = error;
@@ -48,21 +38,6 @@ async function jumpToParagraph(paragraph) {
   });
 }
 
-function checkForErrors(correctFormat, actualFormat, paragraph, setErrors) {
-  Object.keys(correctFormat).forEach((property) => {
-    const actual = actualFormat[property];
-    const correct = correctFormat[property];
-    if (typeof actual !== "object") {
-      if (actual !== correct) {
-        const error = { property, actual, correct, paragraph };
-        setErrors((errors) => [...errors, error]);
-      }
-    } else {
-      checkForErrors(correctFormat[property], actualFormat[property], paragraph, setErrors);
-    }
-  });
-}
-
 const App = (props) => {
   const { title, isOfficeInitialized } = props;
   const [errors, setErrors] = useState([]);
@@ -81,12 +56,7 @@ const App = (props) => {
       await context.sync();
 
       paragraphs.items.forEach((paragraph) => {
-        const actualFormat = paragraph.toJSON();
-        const correctFormat = correctFormats[paragraph.style];
-
-        if (correctFormat && paragraph.text) {
-          checkForErrors(correctFormat, actualFormat, paragraph, setErrors);
-        }
+        lintParagraph(paragraph, setErrors);
       });
       console.log("done!");
       await context.sync();
@@ -127,9 +97,9 @@ const App = (props) => {
   );
 };
 
-export default App;
-
 App.propTypes = {
   title: PropTypes.string,
   isOfficeInitialized: PropTypes.bool,
 };
+
+export default App;
