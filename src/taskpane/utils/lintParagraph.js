@@ -1,8 +1,8 @@
 const commonFont = { bold: true, name: "Arial", color: "#000000" };
 const correctFormats = {
-  "Heading 1": { font: { ...commonFont, size: 12 }, isListItem: true },
-  "Heading 2": { font: { ...commonFont, size: 12 }, isListItem: true },
-  "Heading 3": { font: { ...commonFont, size: 10 }, isListItem: true },
+  "Heading 1": { font: { ...commonFont, size: 12, italic: false }, isListItem: true },
+  "Heading 2": { font: { ...commonFont, size: 12, italic: false }, isListItem: true },
+  "Heading 3": { font: { ...commonFont, size: 10, italic: false }, isListItem: true },
   "Heading 4": { font: { ...commonFont, size: 10, italic: true }, isListItem: true },
   // Normal: { font: { size: 12, name: "Times New Roman" } },
   // isListItem, spaceAfter, etc.
