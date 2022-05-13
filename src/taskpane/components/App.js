@@ -3,21 +3,39 @@ import PropTypes from "prop-types";
 import { DefaultButton } from "@fluentui/react";
 import Progress from "./Progress";
 import lintParagraph from "../utils/lintParagraph";
-import ErrorList from "./ErrorList";
+import { GroupedListBasicExample } from "./ErrorList";
+import { MessageBar, MessageBarButton, MessageBarType } from "@fluentui/react";
 
 /* global Word, require */
 
-// TODO: group errors by paragraph (heading)
-// TODO: display errors grouped (in simple way, don't waste time)
 // TODO: test running "checkParagraphs" after every change
 // TODO: consider creating a gmail add-in
+const CustomMessageBar = ({ numErrors, checkStyles }) => {
+  const message = numErrors === 0 ? "No errors found!" : `${numErrors} error${numErrors === 1 ? "" : "s"} found.`;
+  return (
+    <MessageBar
+      actions={
+        <div>
+          <MessageBarButton onClick={checkStyles}>Check again</MessageBarButton>
+        </div>
+      }
+      messageBarType={numErrors > 0 ? MessageBarType.warning : MessageBarType.success}
+      isMultiline={false}
+    >
+      {message}
+    </MessageBar>
+  );
+};
 
 const App = (props) => {
   const { title, isOfficeInitialized } = props;
   const [errors, setErrors] = useState([]);
+  const [lastChecked, setLastChecked] = useState(null);
+  const [isRunning, setIsRunning] = useState(false);
 
-  const checkParagraphs = async () => {
+  const checkStyles = async () => {
     return Word.run(async (context) => {
+      setIsRunning(true);
       const paragraphs = context.document.body.paragraphs.load("items");
 
       await context.sync();
@@ -33,6 +51,8 @@ const App = (props) => {
         const newErrors = lintParagraph(paragraph);
         setErrors((errors) => [...errors, ...newErrors]);
       });
+      setIsRunning(false);
+      setLastChecked(new Date());
 
       await context.sync();
     });
@@ -47,13 +67,21 @@ const App = (props) => {
       />
     );
   }
-
   return (
     <>
-      <DefaultButton className="ms-welcome__action" onClick={checkParagraphs}>
-        Check Paragraphs
-      </DefaultButton>
-      <ErrorList errors={errors} />
+      {isRunning && <Progress message="Checking styles..." />}
+      {!isRunning && (
+        <>
+          {lastChecked && <CustomMessageBar numErrors={errors.length} checkStyles={checkStyles} />}
+          {lastChecked && <p>Last checked: {lastChecked.toLocaleString()}</p>}
+          {!lastChecked && (
+            <DefaultButton className="ms-welcome__action" onClick={checkStyles}>
+              Check Styles
+            </DefaultButton>
+          )}
+          {errors.length !== 0 && <GroupedListBasicExample errors={errors} />}
+        </>
+      )}
     </>
   );
 };
