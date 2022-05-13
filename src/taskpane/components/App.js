@@ -57,7 +57,8 @@ const App = (props) => {
 
       setErrors([]);
       paragraphs.items.forEach((paragraph) => {
-        lintParagraph(paragraph, setErrors);
+        const newErrors = lintParagraph(paragraph);
+        setErrors((errors) => [...errors, ...newErrors]);
       });
 
       await context.sync();

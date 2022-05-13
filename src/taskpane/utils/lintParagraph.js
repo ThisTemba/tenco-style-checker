@@ -8,28 +8,33 @@ const correctFormats = {
   // Normal: { bold: false, size: 12, name: "Times New Roman" },
 };
 
-const checkForErrors = (correctFormat, actualFormat, paragraph, setErrors) => {
+const getErrors = (correctFormat, actualFormat, paragraph) => {
   const correctProperties = Object.keys(correctFormat);
+  let errors = [];
   correctProperties.forEach((property) => {
     const actual = actualFormat[property];
     const correct = correctFormat[property];
     if (typeof actual !== "object") {
       if (actual !== correct) {
         const error = { property, actual, correct, paragraph };
-        setErrors((errors) => [...errors, error]);
+        errors.push(error);
       }
     } else {
-      checkForErrors(correctFormat[property], actualFormat[property], paragraph, setErrors);
+      const subErrors = getErrors(correctFormat[property], actualFormat[property], paragraph);
+      errors = [...errors, ...subErrors];
     }
   });
+  return errors;
 };
 
-const lintParagraph = (paragraph, setErrors) => {
+const lintParagraph = (paragraph) => {
   const actualFormat = paragraph.toJSON();
   const correctFormat = correctFormats[paragraph.style];
+  let errors = [];
   if (correctFormat !== undefined && paragraph.text !== "") {
-    checkForErrors(correctFormat, actualFormat, paragraph, setErrors);
+    errors = getErrors(correctFormat, actualFormat, paragraph);
   }
+  return errors;
 };
 
 export default lintParagraph;
