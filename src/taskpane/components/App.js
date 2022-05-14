@@ -73,7 +73,7 @@ const App = (props) => {
       {!isRunning && (
         <>
           {lastChecked && <CustomMessageBar numErrors={errors.length} checkStyles={checkStyles} />}
-          {lastChecked && <p>Last checked: {lastChecked.toLocaleString()}</p>}
+          {lastChecked && <p>Last checked: {lastChecked.toLocaleTimeString()}</p>}
           {!lastChecked && (
             <DefaultButton className="ms-welcome__action" onClick={checkStyles}>
               Check Styles

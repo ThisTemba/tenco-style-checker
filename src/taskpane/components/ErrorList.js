@@ -4,11 +4,8 @@ import { DetailsRow } from "@fluentui/react/lib/DetailsList";
 import { SelectionMode } from "@fluentui/react/lib/Selection";
 import _ from "lodash";
 
-const toggleStyles = { root: { marginBottom: "20px" } };
-const groupCount = 3;
-const groupDepth = 1;
-
 // const groups = createGroups(groupCount, groupDepth, 0, groupCount);
+// TODO: refactor all of this, it is very messy
 
 export const ErrorMessage = ({ error }) => {
   const { property, actual, correct, paragraph } = error;
@@ -50,8 +47,7 @@ export const GroupedListBasicExample = ({ errors }) => {
         compact={true}
         group={group}
       />
-    ) : // <ErrorMessage error={item} />
-    null;
+    ) : null;
   };
 
   return (
