@@ -5,6 +5,7 @@ import { Spinner, SpinnerSize } from "@fluentui/react";
 export default class Progress extends React.Component {
   render() {
     const { logo, message, title } = this.props;
+    // TODO: center this a little more somehow
 
     return (
       <section className="ms-welcome__progress ms-u-fadeIn500">
