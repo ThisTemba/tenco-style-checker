@@ -1,3 +1,10 @@
+// TODO: check more things:
+// also check figure names and table names: Arial, bold 10pt and 12pt
+// also check table text: Arial 10pt and 12pt
+// also check headers and footers
+// also check bolded lists (Arial and Times New Roman mixed)
+// also handle text inside tables (smaller I think?)
+
 const commonFont = { bold: true, name: "Arial", color: "#000000" };
 const correctFormats = {
   "Heading 1": { font: { ...commonFont, size: 12, italic: false }, isListItem: true },
