@@ -18,10 +18,7 @@ function getl1Groups(l2Groups) {
     const children = subGroups;
     const group = { count, key, startIndex, name, children, level: 0, isCollapsed: true };
     l1Groups.push(group);
-    console.log("group", group);
-    console.log("groups", l1Groups);
   });
-  console.log("groups", l1Groups);
   return l1Groups;
 }
 
