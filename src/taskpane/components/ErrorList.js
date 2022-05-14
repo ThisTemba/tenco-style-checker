@@ -5,9 +5,6 @@ import { SelectionMode } from "@fluentui/react/lib/Selection";
 import getGroups from "../utils/groupErrors";
 import _ from "lodash";
 
-// const groups = createGroups(groupCount, groupDepth, 0, groupCount);
-// TODO: refactor all of this, it is very messy
-
 async function jumpToParagraph(paragraphId) {
   await Word.run(async (context) => {
     context.document.body.paragraphs.load("items"); // load all paragraphs
@@ -16,6 +13,11 @@ async function jumpToParagraph(paragraphId) {
     const paragraph = paragraphs.find((p) => p._Id === paragraphId); // find paragraph with id
     paragraph.select(); // select paragraph
     await context.sync(); // wait for selection to complete
+  }).catch((error) => {
+    console.log("Error: " + error);
+    if (error instanceof OfficeExtension.Error) {
+      console.log("Debug info: " + JSON.stringify(error.debugInfo));
+    }
   });
 }
 

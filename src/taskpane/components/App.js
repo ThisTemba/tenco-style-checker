@@ -31,30 +31,45 @@ const App = (props) => {
   const { title, isOfficeInitialized } = props;
   const [errors, setErrors] = useState([]);
   const [lastChecked, setLastChecked] = useState(null);
-  const [isRunning, setIsRunning] = useState(false);
+  const [running, setRunning] = useState(false);
+
+  const getParagraphs = async () => {
+    return await Word.run(async (context) => {
+      context.document.body.paragraphs.load("items");
+      await context.sync();
+      const paragraphs = context.document.body.paragraphs.items;
+      paragraphs.forEach((paragraph) => {
+        paragraph.load("font");
+      });
+      await context.sync();
+      return paragraphs;
+    }).catch((error) => {
+      console.log("Error: " + error);
+      if (error instanceof OfficeExtension.Error) {
+        console.log("Debug info: " + JSON.stringify(error.debugInfo));
+      }
+    });
+  };
 
   const checkStyles = async () => {
     return Word.run(async (context) => {
-      setIsRunning(true);
-      const paragraphs = context.document.body.paragraphs.load("items");
-
-      await context.sync();
-
-      paragraphs.items.forEach((paragraph) => {
-        paragraph.load("font");
-      });
-
-      await context.sync();
-
+      setRunning(true);
       setErrors([]);
-      paragraphs.items.forEach((paragraph) => {
+
+      await context.sync();
+      const paragraphs = await getParagraphs();
+      paragraphs.forEach((paragraph) => {
         const newErrors = lintParagraph(paragraph);
         setErrors((errors) => [...errors, ...newErrors]);
       });
-      setIsRunning(false);
-      setLastChecked(new Date());
 
-      await context.sync();
+      setRunning(false);
+      setLastChecked(new Date());
+    }).catch((error) => {
+      console.log("Error: " + error);
+      if (error instanceof OfficeExtension.Error) {
+        console.log("Debug info: " + JSON.stringify(error.debugInfo));
+      }
     });
   };
 
@@ -69,8 +84,8 @@ const App = (props) => {
   }
   return (
     <>
-      {isRunning && <Progress message="Checking styles..." />}
-      {!isRunning && (
+      {running && <Progress message="Checking styles..." />}
+      {!running && (
         <>
           {lastChecked && <CustomMessageBar numErrors={errors.length} checkStyles={checkStyles} />}
           {lastChecked && <p>Last checked: {lastChecked.toLocaleTimeString()}</p>}
