@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { DefaultButton } from "@fluentui/react";
 import Progress from "./Progress";
 import lintParagraph from "../utils/lintParagraph";
-import { GroupedListBasicExample } from "./ErrorList";
+import { ErrorList } from "./ErrorList";
 import { MessageBar, MessageBarButton, MessageBarType } from "@fluentui/react";
 
 /* global Word, require */
@@ -79,7 +79,7 @@ const App = (props) => {
               Check Styles
             </DefaultButton>
           )}
-          {errors.length !== 0 && <GroupedListBasicExample errors={errors} />}
+          {errors.length !== 0 && <ErrorList errors={errors} />}
         </>
       )}
     </>
