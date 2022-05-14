@@ -1,10 +1,10 @@
 import React, { useState } from "react";
+import { DefaultButton, MessageBar, MessageBarButton, MessageBarType } from "@fluentui/react";
 import PropTypes from "prop-types";
-import { DefaultButton } from "@fluentui/react";
 import Progress from "./Progress";
-import lintParagraph from "../utils/lintParagraph";
 import { ErrorList } from "./ErrorList";
-import { MessageBar, MessageBarButton, MessageBarType } from "@fluentui/react";
+import lintParagraph from "../utils/lintParagraph";
+import catcher from "../utils/catchWordError";
 
 /* global Word, require */
 
@@ -43,12 +43,7 @@ const App = (props) => {
       });
       await context.sync();
       return paragraphs;
-    }).catch((error) => {
-      console.log("Error: " + error);
-      if (error instanceof OfficeExtension.Error) {
-        console.log("Debug info: " + JSON.stringify(error.debugInfo));
-      }
-    });
+    }).catch(catcher);
   };
 
   const checkStyles = async () => {
@@ -65,12 +60,7 @@ const App = (props) => {
 
       setRunning(false);
       setLastChecked(new Date());
-    }).catch((error) => {
-      console.log("Error: " + error);
-      if (error instanceof OfficeExtension.Error) {
-        console.log("Debug info: " + JSON.stringify(error.debugInfo));
-      }
-    });
+    }).catch(catcher);
   };
 
   if (!isOfficeInitialized) {

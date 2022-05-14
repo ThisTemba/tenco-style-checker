@@ -1,9 +1,9 @@
 import * as React from "react";
-import { GroupedList } from "@fluentui/react/lib/GroupedList";
-import { DetailsRow } from "@fluentui/react/lib/DetailsList";
-import { SelectionMode } from "@fluentui/react/lib/Selection";
-import getGroups from "../utils/groupErrors";
+import { GroupedList, DetailsRow, SelectionMode } from "@fluentui/react/lib/GroupedList";
 import _ from "lodash";
+
+import getGroups from "../utils/groupErrors";
+import catcher from "../utils/catchWordError";
 
 async function jumpToParagraph(paragraphId) {
   await Word.run(async (context) => {
@@ -13,12 +13,7 @@ async function jumpToParagraph(paragraphId) {
     const paragraph = paragraphs.find((p) => p._Id === paragraphId); // find paragraph with id
     paragraph.select(); // select paragraph
     await context.sync(); // wait for selection to complete
-  }).catch((error) => {
-    console.log("Error: " + error);
-    if (error instanceof OfficeExtension.Error) {
-      console.log("Debug info: " + JSON.stringify(error.debugInfo));
-    }
-  });
+  }).catch(catcher);
 }
 
 export const ErrorMessage = ({ error }) => {
