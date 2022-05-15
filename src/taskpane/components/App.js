@@ -1,17 +1,28 @@
-import React, { useState } from "react";
-import { DefaultButton, MessageBar, MessageBarButton, MessageBarType } from "@fluentui/react";
+import React, { useState, useEffect } from "react";
+import { DefaultButton, MessageBar, MessageBarButton, MessageBarType, Text } from "@fluentui/react";
 import PropTypes from "prop-types";
 import Progress from "./Progress";
 import { ErrorList } from "./ErrorList";
 import lintParagraph from "../utils/lintParagraph";
 import catcher from "../utils/catchWordError";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+
+dayjs.extend(relativeTime);
 
 /* global Word, require */
 
 // TODO: test running "checkParagraphs" after every change
 // TODO: consider creating a gmail add-in
 const CustomMessageBar = ({ numErrors, checkStyles }) => {
-  const message = numErrors === 0 ? "No errors found!" : `${numErrors} error${numErrors === 1 ? "" : "s"} found.`;
+  const message =
+    numErrors === 0 ? (
+      "No errors found!"
+    ) : (
+      <span>
+        Found <b>{numErrors}</b> error{numErrors === 1 ? "" : "s"}.
+      </span>
+    );
   return (
     <MessageBar
       actions={
@@ -19,7 +30,7 @@ const CustomMessageBar = ({ numErrors, checkStyles }) => {
           <MessageBarButton onClick={checkStyles}>Check again</MessageBarButton>
         </div>
       }
-      messageBarType={numErrors > 0 ? MessageBarType.warning : MessageBarType.success}
+      messageBarType={numErrors > 0 ? MessageBarType.error : MessageBarType.success}
       isMultiline={false}
     >
       {message}
@@ -32,6 +43,11 @@ const App = (props) => {
   const [errors, setErrors] = useState([]);
   const [lastChecked, setLastChecked] = useState(null);
   const [running, setRunning] = useState(false);
+  const [currentTime, setCurrentTime] = useState(Date.now());
+
+  useEffect(() => {
+    setInterval(() => setCurrentTime(Date.now()), 60 * 1000);
+  }, []);
 
   const getParagraphs = async () => {
     return await Word.run(async (context) => {
@@ -72,13 +88,20 @@ const App = (props) => {
       />
     );
   }
+
+  // update the last checked to say "checked X minutes ago" instead of "last checked at time X"
   return (
     <>
       {running && <Progress message="Checking styles..." />}
       {!running && (
         <>
           {lastChecked && <CustomMessageBar numErrors={errors.length} checkStyles={checkStyles} />}
-          {lastChecked && <p>Last checked: {lastChecked.toLocaleTimeString()}</p>}
+          {lastChecked && (
+            <Text variant="small">
+              Last checked <u>{dayjs(lastChecked).fromNow()}</u>
+            </Text>
+          )}
+
           {!lastChecked && (
             <DefaultButton className="ms-welcome__action" onClick={checkStyles}>
               Check Styles

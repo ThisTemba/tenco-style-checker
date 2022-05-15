@@ -28,6 +28,7 @@
   "dependencies": {
     "@fluentui/react": "^8.52.3",
     "core-js": "^3.9.1",
+    "dayjs": "^1.11.2",
     "es6-promise": "^4.2.8",
     "lodash": "^4.17.21",
     "react": "^17.0.2",
