@@ -1,5 +1,5 @@
 import * as React from "react";
-import { GroupedList, DetailsRow, SelectionMode } from "@fluentui/react/lib/GroupedList";
+import { GroupedList, DetailsRow, SelectionMode } from "@fluentui/react";
 import _ from "lodash";
 
 import getGroups from "../utils/groupErrors";
