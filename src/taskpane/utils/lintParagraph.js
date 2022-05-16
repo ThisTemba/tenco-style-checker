@@ -1,6 +1,4 @@
 // TODO: check more things:
-// also check figure names and table names: Arial, bold 10pt and 12pt
-// also check table text: Arial 10pt and 12pt
 // also check headers and footers
 // also check bolded lists (Arial and Times New Roman mixed)
 // also handle text inside tables (smaller I think?)
@@ -39,6 +37,11 @@ const formattingRules = [
     condition: (p) => p.text.match(/Table [0-9]/) && p.alignment === "Centered",
     format: { font: { ...boldBlackArial, size: 10 }, tableNestingLevel: 1 },
   },
+  {
+    name: "Figure & Table Captions",
+    condition: (p, pp) => pp && pp.text.match(/Table [0-9]|Figure [0-9]/) && pp.alignment === "Centered",
+    format: { font: { ...boldBlackArial, size: 12 }, alignment: "Centered" },
+  },
 ];
 
 const getErrors = (correctFormat, actualFormat, paragraph, rule) => {
@@ -60,9 +63,9 @@ const getErrors = (correctFormat, actualFormat, paragraph, rule) => {
   return errors;
 };
 
-const lintParagraph = (paragraph) => {
+const lintParagraph = (paragraph, prevParagraph) => {
   const actualFormat = paragraph;
-  const applicableRules = formattingRules.filter((rule) => rule.condition(paragraph));
+  const applicableRules = formattingRules.filter((rule) => rule.condition(paragraph, prevParagraph));
   let errors = [];
   if (applicableRules.length > 0 && paragraph.text !== "") {
     applicableRules.forEach((rule) => {
