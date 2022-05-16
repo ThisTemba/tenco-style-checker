@@ -4,16 +4,36 @@
 // also check headers and footers
 // also check bolded lists (Arial and Times New Roman mixed)
 // also handle text inside tables (smaller I think?)
+// also check for floating (blank) section titles
 
-const commonFont = { bold: true, name: "Arial", color: "#000000" };
-const correctFormats = {
-  "Heading 1": { font: { ...commonFont, size: 12, italic: false }, isListItem: true },
-  "Heading 2": { font: { ...commonFont, size: 12, italic: false }, isListItem: true },
-  "Heading 3": { font: { ...commonFont, size: 10, italic: false }, isListItem: true },
-  "Heading 4": { font: { ...commonFont, size: 10, italic: true }, isListItem: true },
-  // Normal: { font: { size: 12, name: "Times New Roman" } },
-  // isListItem, spaceAfter, etc.
-};
+const boldBlackArial = { bold: true, name: "Arial", color: "#000000" };
+
+const formattingRules = [
+  {
+    condition: (p) => p.style === "Heading 1",
+    format: { font: { ...boldBlackArial, size: 12, italic: false }, isListItem: true },
+  },
+  {
+    condition: (p) => p.style === "Heading 2",
+    format: { font: { ...boldBlackArial, size: 12, italic: false }, isListItem: true },
+  },
+  {
+    condition: (p) => p.style === "Heading 3",
+    format: { font: { ...boldBlackArial, size: 10, italic: false }, isListItem: true },
+  },
+  {
+    condition: (p) => p.style === "Heading 4",
+    format: { font: { ...boldBlackArial, size: 10, italic: true }, isListItem: true },
+  },
+  {
+    condition: (p) => p.text.match(/Figure [0-9]/) && p.alignment === "Centered",
+    format: { font: { ...boldBlackArial, size: 10 } },
+  },
+  {
+    condition: (p) => p.text.match(/Table [0-9]/) && p.alignment === "Centered",
+    format: { font: { ...boldBlackArial, size: 10 }, tableNestingLevel: 1 },
+  },
+];
 
 const getErrors = (correctFormat, actualFormat, paragraph) => {
   const correctProperties = Object.keys(correctFormat);
@@ -35,11 +55,14 @@ const getErrors = (correctFormat, actualFormat, paragraph) => {
 };
 
 const lintParagraph = (paragraph) => {
-  const actualFormat = paragraph.toJSON();
-  const correctFormat = correctFormats[paragraph.style];
+  const actualFormat = paragraph;
+  const applicableRules = formattingRules.filter((rule) => rule.condition(paragraph));
   let errors = [];
-  if (correctFormat !== undefined && paragraph.text !== "") {
-    errors = getErrors(correctFormat, actualFormat, paragraph);
+  if (applicableRules.length > 0 && paragraph.text !== "") {
+    applicableRules.forEach((rule) => {
+      const newErrors = getErrors(rule.format, actualFormat, paragraph);
+      errors = [...errors, ...newErrors];
+    });
   }
   return errors;
 };
