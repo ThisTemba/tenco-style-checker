@@ -31,7 +31,7 @@ function getl2Groups(errors) {
 
     const count = errors.length;
     const key = first.paragraph._Id;
-    const name = truncateText(first.paragraph.text, 25);
+    const name = truncateText(first.paragraph.text, 20);
     const startIndex = currentStartIndex;
     const data = { style: first.paragraph.style };
     const group = { count, key, name, startIndex, data, level: 1 };
