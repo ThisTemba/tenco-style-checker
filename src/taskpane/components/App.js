@@ -70,8 +70,9 @@ const App = (props) => {
 
       await context.sync();
       const paragraphs = await getParagraphs();
-      paragraphs.forEach((paragraph) => {
-        const newErrors = lintParagraph(paragraph);
+      paragraphs.forEach((paragraph, i) => {
+        const prevParagraph = i > 0 ? paragraphs[i - 1] : null;
+        const newErrors = lintParagraph(paragraph, prevParagraph);
         setErrors((errors) => [...errors, ...newErrors]);
       });
 
