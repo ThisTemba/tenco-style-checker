@@ -46,7 +46,7 @@ const App = (props) => {
   const [currentTime, setCurrentTime] = useState(Date.now());
 
   useEffect(() => {
-    setInterval(() => setCurrentTime(Date.now()), 60 * 1000);
+    setInterval(() => setCurrentTime(Date.now()), 60 * 1000); // FIXME: reloading the add-in causes the grouped items to collapse
   }, []);
 
   const getParagraphs = async () => {
@@ -56,6 +56,7 @@ const App = (props) => {
       const paragraphs = context.document.body.paragraphs.items;
       paragraphs.forEach((paragraph) => {
         paragraph.load("font");
+        paragraph.load("parentTableOrNullObject");
       });
       await context.sync();
       return paragraphs;
