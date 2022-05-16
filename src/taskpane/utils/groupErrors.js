@@ -8,11 +8,11 @@ const truncateText = (text, len) => {
 
 function getl1Groups(l2Groups) {
   let l1Groups = [];
-  const groupedGroups = _.groupBy(l2Groups, (group) => group.data.style);
+  const groupedGroups = _.groupBy(l2Groups, (group) => group.data.ruleName);
 
-  _.mapValues(groupedGroups, (subGroups, style) => {
-    const key = style;
-    const name = style;
+  _.mapValues(groupedGroups, (subGroups, ruleName) => {
+    const key = ruleName;
+    const name = ruleName;
     const count = _.sumBy(subGroups, (group) => group.count);
     const startIndex = 0;
     const children = subGroups;
@@ -33,7 +33,7 @@ function getl2Groups(errors) {
     const key = first.paragraph._Id;
     const name = truncateText(first.paragraph.text, 20);
     const startIndex = currentStartIndex;
-    const data = { style: first.paragraph.style };
+    const data = { ruleName: first.ruleName };
     const group = { count, key, name, startIndex, data, level: 1 };
     currentStartIndex += count;
     subGroups.push(group);

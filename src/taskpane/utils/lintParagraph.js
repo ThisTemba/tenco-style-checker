@@ -10,32 +10,38 @@ const boldBlackArial = { bold: true, name: "Arial", color: "#000000" };
 
 const formattingRules = [
   {
+    name: "Heading 1",
     condition: (p) => p.style === "Heading 1",
     format: { font: { ...boldBlackArial, size: 12, italic: false }, isListItem: true },
   },
   {
+    name: "Heading 2",
     condition: (p) => p.style === "Heading 2",
     format: { font: { ...boldBlackArial, size: 12, italic: false }, isListItem: true },
   },
   {
+    name: "Heading 3",
     condition: (p) => p.style === "Heading 3",
     format: { font: { ...boldBlackArial, size: 10, italic: false }, isListItem: true },
   },
   {
+    name: "Heading 4",
     condition: (p) => p.style === "Heading 4",
     format: { font: { ...boldBlackArial, size: 10, italic: true }, isListItem: true },
   },
   {
+    name: "Figure Numbers",
     condition: (p) => p.text.match(/Figure [0-9]/) && p.alignment === "Centered",
     format: { font: { ...boldBlackArial, size: 10 } },
   },
   {
+    name: "Table Numbers",
     condition: (p) => p.text.match(/Table [0-9]/) && p.alignment === "Centered",
     format: { font: { ...boldBlackArial, size: 10 }, tableNestingLevel: 1 },
   },
 ];
 
-const getErrors = (correctFormat, actualFormat, paragraph) => {
+const getErrors = (correctFormat, actualFormat, paragraph, rule) => {
   const correctProperties = Object.keys(correctFormat);
   let errors = [];
   correctProperties.forEach((property) => {
@@ -43,11 +49,11 @@ const getErrors = (correctFormat, actualFormat, paragraph) => {
     const correct = correctFormat[property];
     if (typeof actual !== "object") {
       if (actual !== correct) {
-        const error = { property, actual, correct, paragraph };
+        const error = { property, actual, correct, paragraph, ruleName: rule.name };
         errors.push(error);
       }
     } else {
-      const subErrors = getErrors(correctFormat[property], actualFormat[property], paragraph);
+      const subErrors = getErrors(correctFormat[property], actualFormat[property], paragraph, rule);
       errors = [...errors, ...subErrors];
     }
   });
@@ -60,7 +66,7 @@ const lintParagraph = (paragraph) => {
   let errors = [];
   if (applicableRules.length > 0 && paragraph.text !== "") {
     applicableRules.forEach((rule) => {
-      const newErrors = getErrors(rule.format, actualFormat, paragraph);
+      const newErrors = getErrors(rule.format, actualFormat, paragraph, rule);
       errors = [...errors, ...newErrors];
     });
   }
