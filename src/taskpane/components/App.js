@@ -46,7 +46,8 @@ const App = (props) => {
   const [currentTime, setCurrentTime] = useState(Date.now());
 
   useEffect(() => {
-    setInterval(() => setCurrentTime(Date.now()), 60 * 1000); // FIXME: reloading the add-in causes the grouped items to collapse
+    const interval = setInterval(() => setCurrentTime(Date.now()), 60 * 1000); // FIXME: reloading the add-in causes the grouped items to collapse
+    return () => clearInterval(interval);
   }, []);
 
   const getParagraphs = async () => {
