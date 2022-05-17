@@ -4,45 +4,7 @@
 // also handle text inside tables (smaller I think?)
 // also check for floating (blank) section titles
 
-const boldBlackArial = { bold: true, name: "Arial", color: "#000000" };
-
-const formattingRules = [
-  {
-    name: "Heading 1",
-    condition: (p) => p.style === "Heading 1",
-    format: { font: { ...boldBlackArial, size: 12, italic: false }, isListItem: true },
-  },
-  {
-    name: "Heading 2",
-    condition: (p) => p.style === "Heading 2",
-    format: { font: { ...boldBlackArial, size: 12, italic: false }, isListItem: true },
-  },
-  {
-    name: "Heading 3",
-    condition: (p) => p.style === "Heading 3",
-    format: { font: { ...boldBlackArial, size: 10, italic: false }, isListItem: true },
-  },
-  {
-    name: "Heading 4",
-    condition: (p) => p.style === "Heading 4",
-    format: { font: { ...boldBlackArial, size: 10, italic: true }, isListItem: true },
-  },
-  {
-    name: "Figure Numbers",
-    condition: (p) => p.text.match(/Figure [0-9]/) && p.alignment === "Centered",
-    format: { font: { ...boldBlackArial, size: 10 } },
-  },
-  {
-    name: "Table Numbers",
-    condition: (p) => p.text.match(/Table [0-9]/) && p.alignment === "Centered",
-    format: { font: { ...boldBlackArial, size: 10 }, tableNestingLevel: 1 },
-  },
-  {
-    name: "Figure & Table Captions",
-    condition: (p, pp) => pp && pp.text.match(/Table [0-9]|Figure [0-9]/) && pp.alignment === "Centered",
-    format: { font: { ...boldBlackArial, size: 12 }, alignment: "Centered" },
-  },
-];
+import formattingRules from "../formattingRules";
 
 const getErrors = (correctFormat, actualFormat, paragraph, rule) => {
   const correctProperties = Object.keys(correctFormat);
