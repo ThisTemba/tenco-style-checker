@@ -28,10 +28,9 @@ function getl2Groups(errors) {
   let subGroups = [];
   _.mapValues(groupedErrors, (errors, i) => {
     const first = errors[0];
-
     const count = errors.length;
     const key = first.paragraph._Id;
-    const name = truncateText(first.paragraph.text, 20);
+    const name = truncateText(first.paragraph.text || "[no text]", 20);
     const startIndex = currentStartIndex;
     const data = { ruleName: first.ruleName };
     const group = { count, key, name, startIndex, data, level: 1 };

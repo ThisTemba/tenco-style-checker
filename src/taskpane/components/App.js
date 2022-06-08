@@ -7,6 +7,8 @@ import lintParagraph from "../utils/lintParagraph";
 import catcher from "../utils/catchWordError";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import formattingRules from "../formattingRules";
+import { FontIcon } from "@fluentui/react/lib/Icon";
 
 dayjs.extend(relativeTime);
 
@@ -44,6 +46,7 @@ const App = (props) => {
   const [lastChecked, setLastChecked] = useState(null);
   const [running, setRunning] = useState(false);
   const [currentTime, setCurrentTime] = useState(Date.now());
+  const [numParagraphs, setNumParagraphs] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => setCurrentTime(Date.now()), 60 * 1000); // FIXME: reloading the add-in causes the grouped items to collapse
@@ -55,6 +58,7 @@ const App = (props) => {
       context.document.body.paragraphs.load("items");
       await context.sync();
       const paragraphs = context.document.body.paragraphs.items;
+      setNumParagraphs(paragraphs.length);
       paragraphs.forEach((paragraph) => {
         paragraph.load("font");
         paragraph.load("parentTableOrNullObject");
@@ -68,6 +72,7 @@ const App = (props) => {
     return Word.run(async (context) => {
       setRunning(true);
       setErrors([]);
+      // const sections = context.document.sections.load("items"); // TODO: revisit this and code below to lint footers
 
       await context.sync();
       const paragraphs = await getParagraphs();
@@ -76,6 +81,17 @@ const App = (props) => {
         const newErrors = lintParagraph(paragraph, prevParagraph);
         setErrors((errors) => [...errors, ...newErrors]);
       });
+      // const footers = [];
+      // sections.items.forEach((section) => {
+      //   const footer = section.getFooter("Primary").load();
+      //   footer.load("font");
+      //   footers.push(footer);
+      // });
+      // await context.sync();
+      // footers.forEach((footer) => {
+      //   const newErrors = lintParagraph(footer, null);
+      //   setErrors((errors) => [...errors, ...newErrors]);
+      // });
 
       setRunning(false);
       setLastChecked(new Date());
@@ -86,11 +102,27 @@ const App = (props) => {
     return (
       <Progress
         title={title}
-        logo={require("./../../../assets/logo-filled.png")}
+        logo={require("./../../../assets/logo-tenco-filled.png")}
         message="Please sideload your addin to see app body."
       />
     );
   }
+
+  const CheckedList = ({ numParagraphs, formattingRules }) => {
+    const ruleNames = formattingRules.map((rule) => rule.name);
+    return (
+      <div>
+        Checked {numParagraphs} paragraphs.
+        <ul>
+          {ruleNames.map((ruleName) => (
+            <li key={ruleName}>
+              <FontIcon iconName="Accept" /> {ruleName}
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  };
 
   // update the last checked to say "checked X minutes ago" instead of "last checked at time X"
   return (
@@ -111,6 +143,10 @@ const App = (props) => {
             </DefaultButton>
           )}
           {errors.length !== 0 && <ErrorList errors={errors} />}
+          <br />
+          {errors.length === 0 && lastChecked && (
+            <CheckedList numParagraphs={numParagraphs} formattingRules={formattingRules} />
+          )}
         </>
       )}
     </>

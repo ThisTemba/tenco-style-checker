@@ -3,23 +3,23 @@ const boldBlackArial = { bold: true, name: "Arial", color: "#000000" };
 const formattingRules = [
   {
     name: "Heading 1",
-    condition: (p) => p.style === "Heading 1",
+    condition: (p) => p.style === "Heading 1" && p.text !== "",
     format: { font: { ...boldBlackArial, size: 12, italic: false }, isListItem: true },
     debug: true,
   },
   {
     name: "Heading 2",
-    condition: (p) => p.style === "Heading 2",
+    condition: (p) => p.style === "Heading 2" && p.text !== "",
     format: { font: { ...boldBlackArial, size: 12, italic: false }, isListItem: true },
   },
   {
     name: "Heading 3",
-    condition: (p) => p.style === "Heading 3",
+    condition: (p) => p.style === "Heading 3" && p.text !== "",
     format: { font: { ...boldBlackArial, size: 10, italic: false }, isListItem: true },
   },
   {
     name: "Heading 4",
-    condition: (p) => p.style === "Heading 4",
+    condition: (p) => p.style === "Heading 4" && p.text !== "",
     format: { font: { ...boldBlackArial, size: 10, italic: true }, isListItem: true },
   },
   {
@@ -36,6 +36,11 @@ const formattingRules = [
     name: "Figure & Table Captions",
     condition: (p, pp) => pp && pp.text.match(/Table [0-9]|Figure [0-9]/) && pp.alignment === "Centered",
     format: { font: { ...boldBlackArial, size: 12 }, alignment: "Centered" },
+  },
+  {
+    name: "Empty Headings",
+    condition: (p) => p.text === "" && p.style.includes("Heading"),
+    format: { style: "Normal" },
   },
   // {
   //   name: "Footers",

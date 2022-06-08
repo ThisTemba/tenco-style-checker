@@ -29,8 +29,12 @@ const lintParagraph = (paragraph, prevParagraph) => {
   const actualFormat = paragraph;
   const applicableRules = formattingRules.filter((rule) => rule.condition(paragraph, prevParagraph));
   let errors = [];
-  if (applicableRules.length > 0 && paragraph.text !== "") {
+  if (applicableRules.length > 0) {
     applicableRules.forEach((rule) => {
+      if (rule.debug) {
+        console.log("rule:", rule.name);
+        console.log("paragraph:", paragraph);
+      }
       const newErrors = getErrors(rule.format, actualFormat, paragraph, rule);
       errors = [...errors, ...newErrors];
     });
